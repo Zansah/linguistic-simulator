@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linguistic Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- PAGE TITLE -->
+  <header class="page-header">
+    <h1 class="page-title">Linguistic Simulator</h1>
+  </header>
+
+  <!-- MAIN CARD -->
+  <main class="card-wrapper">
+    <div class="card">
+
+      <div class="orb-container" id="orbContainer">
+        <div class="orb" id="orb"></div>
+      </div>
+
+      <!-- STATUS TEXT -->
+      <p class="status-text" id="statusText">
+        Select a mode and type a sentence to see your language transform.
+      </p>
+
+      <!-- INPUT BOX -->
+      <div class="input-box">
+        <textarea
+          id="userInput"
+          class="text-input"
+          rows="2"
+          placeholder="Type a sentence here…"
+          aria-label="Sentence to transform"
+        ></textarea>
+
+        <div class="input-actions">
+          <button class="action-btn" id="modeBtn" aria-haspopup="true" aria-label="Select context mode">
+            <!-- Grid icon -->
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
+              <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
+              <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
+              <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
+            </svg>
+            <span id="modeBtnLabel">Mode</span>
+          </button>
+
+          <button class="action-btn" id="searchBtn" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Search
+          </button>
+
+          <div class="spacer"></div>
+
+          <button class="action-btn icon-only" id="micBtn" aria-label="Speak input">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="5.5" y="1" width="5" height="8" rx="2.5" fill="currentColor"/>
+              <path d="M2 8.5A6 6 0 0014 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="8" y1="14.5" x2="8" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <button class="submit-btn" id="transformBtn" aria-label="Transform sentence">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- CAPTION -->
+  <footer class="page-caption">
+    <p>A linguistic autobiography — <em>how context shapes the way I speak American English.</em></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
