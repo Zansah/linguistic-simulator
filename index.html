@@ -8,63 +8,71 @@
 </head>
 <body>
 
-  <!-- PAGE TITLE -->
   <header class="page-header">
     <h1 class="page-title">Linguistic Simulator</h1>
   </header>
 
-  <!-- MAIN CARD -->
   <main class="card-wrapper">
     <div class="card">
 
-      <!-- PULSING ORB -->
-      <div class="orb-container" id="orbContainer">
-        <div class="orb" id="orb"></div>
+      <div class="voice-container" id="voiceContainer" aria-hidden="true">
+        <span class="bar" style="--i:0"></span>
+        <span class="bar" style="--i:1"></span>
+        <span class="bar" style="--i:2"></span>
+        <span class="bar" style="--i:3"></span>
+        <span class="bar" style="--i:4"></span>
+        <span class="bar" style="--i:5"></span>
+        <span class="bar" style="--i:6"></span>
+        <span class="bar" style="--i:7"></span>
+        <span class="bar" style="--i:8"></span>
+        <span class="bar" style="--i:9"></span>
+        <span class="bar" style="--i:10"></span>
+        <span class="bar" style="--i:11"></span>
       </div>
 
-      <!-- STATUS TEXT -->
       <p class="status-text" id="statusText">
         Select a mode and type a sentence to see your language transform.
       </p>
 
-      <!-- MODE PICKER PANEL (hidden by default, toggled by Mode button) -->
       <div class="mode-panel" id="modePanel" aria-hidden="true" role="listbox" aria-label="Select language mode">
         <p class="mode-panel-label">Choose a register</p>
 
         <button class="mode-option" data-mode="academic" role="option" aria-selected="false">
-          <span class="mode-option-icon"></span>
           <span class="mode-option-info">
             <span class="mode-option-name">Academic</span>
-            <span class="mode-option-desc">Formal</span>
+            <span class="mode-option-desc">Formal, hedged, precise — professors and essays</span>
           </span>
         </button>
 
         <button class="mode-option" data-mode="casual" role="option" aria-selected="false">
-          <span class="mode-option-icon"></span>
           <span class="mode-option-info">
             <span class="mode-option-name">Casual</span>
-            <span class="mode-option-desc">Everyday english</span>
+            <span class="mode-option-desc">Relaxed American English</span>
           </span>
         </button>
 
-        <button class="mode-option" data-ode="family" role="option" aria-selected="false">
-          <span class="mode-option-icon"></span>
+        <button class="mode-option" data-mode="family" role="option" aria-selected="false">
           <span class="mode-option-info">
             <span class="mode-option-name">Family</span>
-            <span class="mode-option-desc">English · Français · Twi</span>
+            <span class="mode-option-desc">English · Français · Twi — home speech mix</span>
           </span>
         </button>
 
         <button class="mode-option" data-mode="email" role="option" aria-selected="false">
-          <span class="mode-option-icon"></span>
           <span class="mode-option-info">
             <span class="mode-option-name">Formal Email</span>
-            <span class="mode-option-desc">Professional</span>
+            <span class="mode-option-desc">Professional English</span>
           </span>
         </button>
       </div>
 
-      <!-- INPUT BOX -->
+      <div class="voice-panel" id="voicePanel" aria-hidden="true" role="dialog" aria-label="Select voice accent">
+        <p class="mode-panel-label">Choose a voice</p>
+        <div class="voice-list" id="voiceList">
+          <p class="voice-loading">Loading available voices…</p>
+        </div>
+      </div>
+
       <div class="input-box">
         <textarea
           id="userInput"
@@ -77,28 +85,38 @@
         <div class="input-actions">
 
           <button class="action-btn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modePanel" aria-label="Select context mode">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
-              <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
-              <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
-              <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
+              <rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
+              <rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
+              <rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
             </svg>
             <span id="modeBtnLabel">Mode</span>
           </button>
 
+          <button class="action-btn" id="voiceBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="voicePanel" aria-label="Select voice">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M7 1.5C5.5 3 4.5 5 4.5 7s1 4 2.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M7 1.5C8.5 3 9.5 5 9.5 7s-1 4-2.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <line x1="1.5" y1="7" x2="12.5" y2="7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <span id="voiceBtnLabel">Voice</span>
+          </button>
+
           <div class="spacer"></div>
 
-          <button class="action-btn icon-only" id="micBtn" aria-label="Speak input">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <rect x="5.5" y="1" width="5" height="8" rx="2.5" fill="currentColor"/>
-              <path d="M2 8.5A6 6 0 0014 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <line x1="8" y1="14.5" x2="8" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <button class="action-btn icon-only" id="micBtn" aria-label="Play audio">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="4.5" y="1" width="5" height="7" rx="2.5" fill="currentColor"/>
+              <path d="M1.5 7.5A5.5 5.5 0 0012.5 7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <line x1="7" y1="13" x2="7" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
             </svg>
           </button>
 
           <button class="submit-btn" id="transformBtn" aria-label="Transform sentence">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
 
@@ -108,7 +126,6 @@
     </div>
   </main>
 
-  <!-- CAPTION -->
   <footer class="page-caption">
     <p>A linguistic autobiography — <em>how context shapes the way I speak American English.</em></p>
   </footer>
