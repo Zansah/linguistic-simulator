@@ -1,5 +1,5 @@
 /* ============================================================
-   LINGUISTIC SIMULATOR — STAGE 1: Base UI Layout
+   LINGUISTIC SIMULATOR — VERSION 2: Mode Selector
    ============================================================ */
 
 *, *::before, *::after {
@@ -9,26 +9,33 @@
 }
 
 :root {
-  /* Colours */
-  --bg:           #f0f2f7;
-  --card-bg:      #ffffff;
-  --input-bg:     #f5f6fa;
-  --border:       #e4e7ef;
-  --text-primary: #1a1d2e;
+  --bg:            #f0f2f7;
+  --card-bg:       #ffffff;
+  --input-bg:      #f5f6fa;
+  --border:        #e4e7ef;
+  --text-primary:  #1a1d2e;
   --text-secondary:#6b7280;
-  --text-muted:   #9ca3af;
-  --accent:       #3b82f6;
+  --text-muted:    #9ca3af;
+  --accent:        #3b82f6;
 
   --orb-a: #ff6b35;
   --orb-b: #f59e0b;
   --orb-c: #ef4444;
 
-  --card-radius: 24px;
+  /* Mode accent colours — used to tint active state */
+  --mode-academic: #6366f1;
+  --mode-casual:   #10b981;
+  --mode-family:   #f59e0b;
+  --mode-email:    #8b5cf6;
+
+  --card-radius:  24px;
   --input-radius: 16px;
+  --panel-radius: 14px;
 
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+/* ── BASE ── */
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -41,9 +48,8 @@ body {
   gap: 1.5rem;
 }
 
-.page-header {
-  text-align: center;
-}
+/* ── HEADER ── */
+.page-header { text-align: center; }
 
 .page-title {
   font-size: 1.6rem;
@@ -52,14 +58,7 @@ body {
   color: var(--accent);
 }
 
-.page-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
+/* ── CARD ── */
 .card-wrapper {
   width: 100%;
   max-width: 420px;
@@ -72,12 +71,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   box-shadow:
     0 2px 4px rgba(0,0,0,0.04),
     0 8px 24px rgba(0,0,0,0.08);
+  position: relative; /* anchor for the mode panel */
 }
 
+/* ── ORB ── */
 .orb-container {
   position: relative;
   width: 110px;
@@ -114,18 +115,124 @@ body {
 }
 
 @keyframes orb-breathe {
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(255,107,53,0.4), 0 6px 24px rgba(239,68,68,0.3); }
-  50%       { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(255,107,53,0.08), 0 8px 30px rgba(239,68,68,0.35); }
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255,107,53,0.4), 0 6px 24px rgba(239,68,68,0.3);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 10px rgba(255,107,53,0.08), 0 8px 30px rgba(239,68,68,0.35);
+  }
 }
 
+/* ── STATUS TEXT ── */
 .status-text {
   font-size: 0.88rem;
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.65;
   max-width: 280px;
+  min-height: 2.5em;
+  transition: color 0.25s;
 }
 
+/* ── MODE PANEL ── */
+.mode-panel {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--panel-radius);
+  padding: 0.6rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  /* Hidden by default */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.25s ease;
+}
+
+.mode-panel.open {
+  max-height: 400px;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 0.75rem 0.5rem;
+}
+
+.mode-panel-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0 0.5rem 0.4rem;
+  font-weight: 500;
+}
+
+/* Individual mode options */
+.mode-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mode-option:hover {
+  background: rgba(0,0,0,0.03);
+  border-color: var(--border);
+}
+
+/* Active / selected mode */
+.mode-option.selected {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Per-mode selected accent colours */
+.mode-option[data-mode="academic"].selected { background: rgba(99,102,241,0.07);  border-color: rgba(99,102,241,0.25); }
+.mode-option[data-mode="casual"].selected   { background: rgba(16,185,129,0.07);  border-color: rgba(16,185,129,0.25); }
+.mode-option[data-mode="family"].selected   { background: rgba(245,158,11,0.07);  border-color: rgba(245,158,11,0.25); }
+.mode-option[data-mode="email"].selected    { background: rgba(139,92,246,0.07);  border-color: rgba(139,92,246,0.25); }
+
+.mode-option-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.mode-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-option-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mode-option[data-mode="academic"].selected .mode-option-name { color: var(--mode-academic); }
+.mode-option[data-mode="casual"].selected   .mode-option-name { color: var(--mode-casual); }
+.mode-option[data-mode="family"].selected   .mode-option-name { color: var(--mode-family); }
+.mode-option[data-mode="email"].selected    .mode-option-name { color: var(--mode-email); }
+
+.mode-option-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── INPUT BOX ── */
 .input-box {
   width: 100%;
   background: var(--input-bg);
@@ -156,10 +263,9 @@ body {
   min-height: 40px;
 }
 
-.text-input::placeholder {
-  color: var(--text-muted);
-}
+.text-input::placeholder { color: var(--text-muted); }
 
+/* ── INPUT ACTIONS ── */
 .input-actions {
   display: flex;
   align-items: center;
@@ -190,9 +296,14 @@ body {
   color: var(--text-primary);
 }
 
-.action-btn.icon-only {
-  padding: 5px 8px;
+/* Lit-up state when a mode is active */
+.action-btn.mode-active {
+  border-color: #c7d2fe;
+  color: var(--mode-academic);
+  background: rgba(99,102,241,0.06);
 }
+
+.action-btn.icon-only { padding: 5px 8px; }
 
 .submit-btn {
   width: 32px;
@@ -213,10 +324,9 @@ body {
   transform: scale(1.08);
 }
 
-.submit-btn:active {
-  transform: scale(0.96);
-}
+.submit-btn:active { transform: scale(0.96); }
 
+/* ── FOOTER ── */
 .page-caption {
   text-align: center;
   color: var(--text-muted);
@@ -230,20 +340,19 @@ body {
   color: var(--text-secondary);
 }
 
+/* ── FOCUS ── */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+/* ── RESPONSIVE ── */
 @media (max-width: 480px) {
-  .card {
-    padding: 2rem 1.25rem 1.5rem;
-  }
-  .page-title {
-    font-size: 1.35rem;
-  }
+  .card { padding: 2rem 1.25rem 1.5rem; }
+  .page-title { font-size: 1.35rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .orb { animation: none; }
+  .mode-panel { transition: none; }
 }

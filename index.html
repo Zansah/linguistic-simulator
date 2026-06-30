@@ -17,6 +17,7 @@
   <main class="card-wrapper">
     <div class="card">
 
+      <!-- PULSING ORB -->
       <div class="orb-container" id="orbContainer">
         <div class="orb" id="orb"></div>
       </div>
@@ -25,6 +26,43 @@
       <p class="status-text" id="statusText">
         Select a mode and type a sentence to see your language transform.
       </p>
+
+      <!-- MODE PICKER PANEL (hidden by default, toggled by Mode button) -->
+      <div class="mode-panel" id="modePanel" aria-hidden="true" role="listbox" aria-label="Select language mode">
+        <p class="mode-panel-label">Choose a register</p>
+
+        <button class="mode-option" data-mode="academic" role="option" aria-selected="false">
+          <span class="mode-option-icon"></span>
+          <span class="mode-option-info">
+            <span class="mode-option-name">Academic</span>
+            <span class="mode-option-desc">Formal</span>
+          </span>
+        </button>
+
+        <button class="mode-option" data-mode="casual" role="option" aria-selected="false">
+          <span class="mode-option-icon"></span>
+          <span class="mode-option-info">
+            <span class="mode-option-name">Casual</span>
+            <span class="mode-option-desc">Everyday english</span>
+          </span>
+        </button>
+
+        <button class="mode-option" data-ode="family" role="option" aria-selected="false">
+          <span class="mode-option-icon"></span>
+          <span class="mode-option-info">
+            <span class="mode-option-name">Family</span>
+            <span class="mode-option-desc">English · Français · Twi</span>
+          </span>
+        </button>
+
+        <button class="mode-option" data-mode="email" role="option" aria-selected="false">
+          <span class="mode-option-icon"></span>
+          <span class="mode-option-info">
+            <span class="mode-option-name">Formal Email</span>
+            <span class="mode-option-desc">Professional</span>
+          </span>
+        </button>
+      </div>
 
       <!-- INPUT BOX -->
       <div class="input-box">
@@ -37,8 +75,8 @@
         ></textarea>
 
         <div class="input-actions">
-          <button class="action-btn" id="modeBtn" aria-haspopup="true" aria-label="Select context mode">
-            <!-- Grid icon -->
+
+          <button class="action-btn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modePanel" aria-label="Select context mode">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
               <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
@@ -46,14 +84,6 @@
               <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/>
             </svg>
             <span id="modeBtnLabel">Mode</span>
-          </button>
-
-          <button class="action-btn" id="searchBtn" aria-label="Search">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            Search
           </button>
 
           <div class="spacer"></div>
@@ -71,6 +101,7 @@
               <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
+
         </div>
       </div>
 
