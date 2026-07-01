@@ -7,7 +7,7 @@
 
 ## What This Project Is
 
-This web app models how a single speaker — me — shifts between different varieties of American English depending on **context**, **audience**, and **situation**. You type a sentence, pick a mode (Academic, Casual, Family, Gaming, Formal Email, or Texting/Slang), and the app rewrites it to reflect how I would actually say it in that setting. A pulsing orb plays the result back using text-to-speech.
+This web app models how a single speaker — me — shifts between different varieties of American English depending on **context**, **audience**, and **situation**. You type a sentence, pick a mode (Academic, Casual, Formal Email, or Texting/Slang), and the app rewrites it to reflect how one would say in that setting.
 
 Concepts in this project are: 
 
@@ -29,8 +29,6 @@ I've been exposed to several distinct varieties of English, this web app models 
 **Standard American English** is what I learned in school and is used in professional settings. Examples of this would be "I would argue that..." or "I am not entirely certain" sounds formal.
 
 **Casual American English** the type of language I use with friends. 
-
-**Family speech** the language I use with my parents. Uses a mix of English, French, and Twi (Akan) words, and is more diret than casual speech. 
 ---
 
 ### What social factors shaped the way I speak English?
