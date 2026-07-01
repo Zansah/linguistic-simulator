@@ -1,45 +1,84 @@
 'use strict';
 
+/* ============================================================
+   GROQ AI CONFIG
+   ------------------------------------------------------------
+   Put your Groq API key below. Since this is a static GitHub
+   Pages site, the key will be visible in the JS source to
+   anyone who looks — fine for a throwaway/demo key, but don't
+   reuse a key you care about, and rotate it when you're done.
+   Get a key at https://console.groq.com/keys
+   ============================================================ */
+const GROQ_CONFIG = {
+  apiKey:       'YOUR_GROQ_API_KEY_HERE',
+  apiKeyBackup: 'YOUR_BACKUP_GROQ_API_KEY_HERE',
+  model:    'openai/gpt-oss-120b',
+  endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+};
+
 const MODE_CONFIG = {
   academic: {
     label:    'Academic',
     color:    '#6366f1',
-    register: 'high formal',
+    register: 'high formal register',
+    promptHint:
+      'High academic register. Use epistemic hedging ("it could be argued that", "this suggests"), ' +
+      'elevated and often Latinate lexical choices over their plain Anglo-Saxon equivalents, ' +
+      'complex hypotactic syntax with subordinate clauses rather than short independent ones, ' +
+      'passive constructions where they foreground the subject matter over the speaker, ' +
+      'third-person distancing, and formal discourse markers ("furthermore", "however", "thus", "moreover"). ' +
+      'Avoid contractions entirely.',
   },
   casual: {
     label:    'Casual',
     color:    '#10b981',
-    register: 'informal',
+    register: 'low informal register',
+    promptHint:
+      'Low informal register, the kind used in relaxed speech between friends. ' +
+      'Use contracted forms ("I\'m", "gonna", "kinda"), simple paratactic syntax (short clauses ' +
+      'loosely joined rather than subordinated), everyday colloquial lexis, spoken discourse markers ' +
+      '("like", "honestly", "I mean", "so"), and occasional sentence fragments. Relaxed punctuation is fine.',
   },
-  family: {
-    label:    'Family',
+  texting: {
+    label:    'Texting',
     color:    '#f59e0b',
-    register: 'mixed-language — English, French, Twi',
+    register: 'digital shorthand register',
+    promptHint:
+      'Texting and SMS register. Use heavy ellipsis, dropping subjects and auxiliaries where the meaning ' +
+      'is still recoverable ("not done yet" instead of "I am not done yet"). Favor lowercase orthography, ' +
+      'common digital abbreviations and clippings ("u", "ur", "rn", "ngl", "fr", "idk", "tbh"), minimal ' +
+      'terminal punctuation (periods are usually dropped at the end of a thought), and clipped sentence ' +
+      'fragments over full clauses. This is lexical compression, not just casual tone.',
   },
   email: {
     label:    'Formal Email',
     color:    '#8b5cf6',
-    register: 'professional written',
+    register: 'professional written register',
+    promptHint:
+      'Professional written register for a workplace email. Use polite hedging and mitigation ' +
+      '("I wanted to follow up", "if possible", "when you have a moment"), modal verbs for politeness ' +
+      '("could", "would", "might"), conventional formal openers and closers, structured discourse markers ' +
+      '("firstly", "additionally", "in conclusion"), and avoid contractions. Less syntactically dense than ' +
+      'academic prose, but still measured and courteous.',
   },
 };
 
 const ACCENT_GROUPS = [
-  {
-    group: 'American English',
-    langs: ['en-US'],
-  },
-  {
-    group: 'British English',
-    langs: ['en-GB'],
-  },
-  {
-    group: 'Australian English',
-    langs: ['en-AU'],
-  },
-  {
-    group: 'French',
-    langs: ['fr-FR', 'fr-CA'],
-  },
+  { group: 'American English',      langs: ['en-US'] },
+  { group: 'British English',       langs: ['en-GB'] },
+  { group: 'Australian English',    langs: ['en-AU'] },
+  { group: 'Canadian English',      langs: ['en-CA'] },
+  { group: 'Irish English',         langs: ['en-IE'] },
+  { group: 'New Zealand English',   langs: ['en-NZ'] },
+  { group: 'South African English', langs: ['en-ZA'] },
+  { group: 'Indian English',        langs: ['en-IN'] },
+  { group: 'Nigerian English',      langs: ['en-NG'] },
+  { group: 'Ghanaian English',      langs: ['en-GH'] },
+  { group: 'Kenyan English',        langs: ['en-KE'] },
+  { group: 'Filipino English',      langs: ['en-PH'] },
+  { group: 'Singaporean English',   langs: ['en-SG'] },
+  { group: 'Jamaican English',      langs: ['en-JM'] },
+  { group: 'French',                langs: ['fr-FR', 'fr-CA'] },
 ];
 
 const TRANSFORMATIONS = [
@@ -48,7 +87,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I find myself unable to fully apprehend the meaning of your statement.',
       casual:   "Wait, I'm kinda lost — what are you saying?",
-      family:   "Mframa, me nka asem no. I don't get it at all.",
+      texting:  "wait i dont get it at all, can u explain",
       email:    'I want to ensure I fully understand your point — could you kindly clarify?',
     },
   },
@@ -57,7 +96,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I require additional time to complete this task to the expected standard.',
       casual:   "Hey, I'm gonna need a bit more time — not done yet.",
-      family:   "Ma me time kakra. I'm not finished yet, s'il te plaît.",
+      texting:  "ngl need a bit more time, not done yet",
       email:    'I am writing to request a brief extension, as I require additional time to finalize this.',
     },
   },
@@ -66,7 +105,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'This task presents a considerable degree of cognitive difficulty.',
       casual:   "Okay this is genuinely hard, not gonna lie.",
-      family:   "Eyi ye den paa. C'est vraiment difficile for me.",
+      texting:  "ok this is rly hard ngl",
       email:    'I wanted to flag that I am finding this more challenging than anticipated.',
     },
   },
@@ -75,7 +114,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'Could you elaborate further on that point, perhaps with greater specificity?',
       casual:   'Wait can you run that by me again?',
-      family:   "Kan bio. Di o encore — I didn't catch that.",
+      texting:  "wait can u say that again",
       email:    'I would greatly appreciate it if you could clarify that point at your convenience.',
     },
   },
@@ -84,7 +123,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I am experiencing a notable degree of fatigue at present.',
       casual:   "I'm dead tired right now.",
-      family:   "Me bo ahu. Je suis épuisé — I can't anymore.",
+      texting:  "im so tired rn",
       email:    'I should mention I am operating under some fatigue, though this will not affect my output.',
     },
   },
@@ -93,7 +132,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I find this to be a genuinely impressive and noteworthy development.',
       casual:   "Okay wait, this is actually really good.",
-      family:   "Eyi ye fe paa! J'aime ça — this is so good.",
+      texting:  "omg i actually love this",
       email:    'Thank you for sharing — I find this to be quite impressive.',
     },
   },
@@ -102,7 +141,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I must confess a marked reluctance to engage with this matter.',
       casual:   "Honestly? I really don't want to do this.",
-      family:   "Me pe saa. Non, je veux pas — please don't make me.",
+      texting:  "ngl i really dont wanna do this",
       email:    'I wanted to respectfully express some hesitation regarding this matter.',
     },
   },
@@ -111,7 +150,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I am not in a position to assert this with any meaningful certainty.',
       casual:   "Honestly, I have no clue.",
-      family:   "Me nim. Je sais pas — I really don't know.",
+      texting:  "tbh idk",
       email:    'I must acknowledge some uncertainty on my part regarding this matter.',
     },
   },
@@ -120,7 +159,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I can confirm this in the affirmative.',
       casual:   'Yeah, for sure!',
-      family:   'Aane! Oui — yes of course.',
+      texting:  "yeah for sure",
       email:    'I am pleased to confirm in the affirmative.',
     },
   },
@@ -129,7 +168,7 @@ const TRANSFORMATIONS = [
     outputs: {
       academic: 'I must respectfully decline on this occasion.',
       casual:   'Nah, not happening.',
-      family:   'Daabi. Non — absolutely not.',
+      texting:  "nah",
       email:    'I regret to inform you that I must decline on this occasion.',
     },
   },
@@ -166,18 +205,20 @@ function genericTransform(sentence, mode) {
         .replace(/\bvery\b/gi, 'really')
         .replace(/[.]+$/, '') + '.';
     },
-    family: (t) => {
-      const inserts = [
-        ['Yen ko.', 'Let\'s go.'],
-        ['Meda wo ase.', 'Thank you.'],
-        ['Akwaaba.', 'Welcome.'],
-      ];
-      const base = t
-        .replace(/\bI am\b/gi, "I'm")
+    texting: (t) => {
+      const fillers = ['ngl ', 'tbh ', 'ok so ', 'wait '];
+      const filler = fillers[Math.floor(Math.random() * fillers.length)];
+      const out = t
+        .replace(/\byou\b/gi, 'u')
+        .replace(/\byour\b/gi, 'ur')
+        .replace(/\bI am\b/gi, 'im')
+        .replace(/\bI'm\b/gi, 'im')
+        .replace(/\bcannot\b/gi, "can't")
         .replace(/\bdo not\b/gi, "don't")
-        .replace(/\bcannot\b/gi, "can't");
-      const pick = inserts[Math.floor(Math.random() * inserts.length)];
-      return pick[0] + ' ' + base;
+        .replace(/\breally\b/gi, 'rly')
+        .replace(/\bbecause\b/gi, 'bc')
+        .replace(/[.]+$/, '');
+      return (filler + out).toLowerCase();
     },
     email: (t) => {
       const openers = [
@@ -199,7 +240,7 @@ function genericTransform(sentence, mode) {
   return fn(s);
 }
 
-function transform(sentence, mode) {
+function localTransform(sentence, mode) {
   if (!sentence || !sentence.trim()) return '';
   for (const p of TRANSFORMATIONS) {
     if (p.detect.test(sentence)) {
@@ -207,6 +248,115 @@ function transform(sentence, mode) {
     }
   }
   return genericTransform(sentence, mode);
+}
+
+/* ============================================================
+   GROQ AI TRANSFORM
+   ============================================================ */
+async function groqTransform(sentence, mode, useBackupKey) {
+  const cfg = MODE_CONFIG[mode];
+  const keyToUse = useBackupKey ? GROQ_CONFIG.apiKeyBackup : GROQ_CONFIG.apiKey;
+
+  const systemPrompt =
+    'You are simulating a sociolinguistic register shift: the way a real speaker naturally adjusts ' +
+    'their language for a different communicative context while keeping the same underlying meaning. ' +
+    'Target register: ' + cfg.label + '. ' + cfg.promptHint + ' ' +
+    'Adjust across these linguistic dimensions, not just vocabulary: syntax (clause length and complexity, ' +
+    'coordination vs subordination), morphology (contractions, inflections, clipped forms), lexis ' +
+    '(word choice and level of formality), and discourse markers (the small connective words a speaker ' +
+    'uses to structure what they are saying). ' +
+    'Write the way an actual person talks or writes in that situation, not the way an AI assistant talks. ' +
+    'Use plain, natural punctuation: periods, commas, and the occasional question mark or exclamation point. ' +
+    'Do not use em dashes or en dashes anywhere in your response, use a comma, period, or "and" instead. ' +
+    'Do not use semicolons. Do not start with phrases like "I would say" or "Here\'s the rewrite". ' +
+    'Keep the original meaning intact and keep it roughly the same length as the input. ' +
+    'Respond with ONLY the rewritten sentence and nothing else, no quotes around it, no preamble, no explanation.';
+
+  // Hard timeout: if Groq stalls instead of erroring out, abort rather than hang forever.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  let response;
+  try {
+    response = await fetch(GROQ_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + keyToUse,
+      },
+      body: JSON.stringify({
+        model: GROQ_CONFIG.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: sentence },
+        ],
+        temperature: 0.85,
+        max_tokens:  200,
+      }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Groq API timed out after 8s');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error('Groq API error ' + response.status + ': ' + errText);
+  }
+
+  const data = await response.json();
+  const text = data && data.choices && data.choices[0] && data.choices[0].message
+    ? data.choices[0].message.content
+    : '';
+
+  // Safety net: strip any em/en dashes the model slips in anyway, swap for a comma.
+  return (text || '')
+    .trim()
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/,\s*,/g, ',')
+    .replace(/,\s*\./g, '.');
+}
+
+async function transform(sentence, mode) {
+  if (!sentence || !sentence.trim()) return '';
+
+  const keyIsSet = GROQ_CONFIG.apiKey && GROQ_CONFIG.apiKey !== 'YOUR_GROQ_API_KEY_HERE';
+  const backupKeyIsSet = GROQ_CONFIG.apiKeyBackup && GROQ_CONFIG.apiKeyBackup !== 'YOUR_BACKUP_GROQ_API_KEY_HERE';
+
+  if (!keyIsSet) {
+    console.warn('[Linguistic Simulator] No Groq API key set — using local fallback. Add your key to GROQ_CONFIG.apiKey.');
+    return localTransform(sentence, mode);
+  }
+
+  // Try the primary key first.
+  try {
+    const result = await groqTransform(sentence, mode, false);
+    console.log('[Linguistic Simulator] Groq API responded successfully (primary key).');
+    return result;
+  } catch (primaryErr) {
+    console.warn('[Linguistic Simulator] Primary Groq key failed:', primaryErr);
+  }
+
+  // Primary failed — try the backup key if one is configured.
+  if (backupKeyIsSet) {
+    try {
+      const result = await groqTransform(sentence, mode, true);
+      console.log('[Linguistic Simulator] Groq API responded successfully (backup key).');
+      return result;
+    } catch (backupErr) {
+      console.error('[Linguistic Simulator] Backup Groq key also failed:', backupErr);
+    }
+  }
+
+  // Both keys failed (or no backup configured) — fall back to local transform.
+  statusText.textContent = 'Groq API error (check console) — showing local fallback instead.';
+  await new Promise(r => setTimeout(r, 1200));
+  return localTransform(sentence, mode);
 }
 
 const state = {
@@ -282,68 +432,65 @@ function loadVoices() {
   const raw = window.speechSynthesis.getVoices();
   if (!raw.length) return;
 
-  const filtered = [];
   const seen = new Set();
+  const flatVoices = [];
+  const groups = [];
 
-  const preferredLangs = ['en-US', 'en-GB', 'en-AU', 'fr-FR', 'fr-CA'];
-
-  preferredLangs.forEach(lang => {
-    const matches = raw.filter(v => v.lang === lang || v.lang.startsWith(lang.split('-')[0]));
-    matches.forEach(v => {
-      if (!seen.has(v.name)) {
-        seen.add(v.name);
-        filtered.push(v);
-      }
+  ACCENT_GROUPS.forEach(({ group, langs }) => {
+    const groupVoices = [];
+    langs.forEach(lang => {
+      const base = lang.split('-')[0];
+      raw
+        .filter(v => v.lang === lang || v.lang.replace('_', '-') === lang)
+        .forEach(v => {
+          if (!seen.has(v.name)) {
+            seen.add(v.name);
+            groupVoices.push(v);
+          }
+        });
     });
+    if (groupVoices.length) {
+      groupVoices.forEach(v => flatVoices.push(v));
+      groups.push({ group, voices: groupVoices });
+    }
   });
 
-  if (!filtered.length) {
+  // Fallback: browser has voices but none matched any dialect we listed.
+  if (!flatVoices.length) {
     raw.slice(0, 12).forEach(v => {
       if (!seen.has(v.name)) {
         seen.add(v.name);
-        filtered.push(v);
+        flatVoices.push(v);
       }
     });
+    if (flatVoices.length) {
+      groups.push({ group: 'Available voices', voices: flatVoices });
+    }
   }
 
-  state.availableVoices = filtered;
-  renderVoiceList(filtered);
+  state.availableVoices = flatVoices;
+  renderVoiceList(groups);
 }
 
-function friendlyLang(lang) {
-  const map = {
-    'en-US': 'American English',
-    'en-GB': 'British English',
-    'en-AU': 'Australian English',
-    'en-CA': 'Canadian English',
-    'en-IE': 'Irish English',
-    'en-IN': 'Indian English',
-    'fr-FR': 'French (France)',
-    'fr-CA': 'French (Canada)',
-    'es-ES': 'Spanish (Spain)',
-    'es-US': 'Spanish (US)',
-    'de-DE': 'German',
-    'zh-CN': 'Mandarin',
-    'ja-JP': 'Japanese',
-  };
-  return map[lang] || lang;
-}
-
-function renderVoiceList(voices) {
-  if (!voices.length) {
+function renderVoiceList(groups) {
+  if (!groups.length) {
     voiceList.innerHTML = '<p class="voice-loading">No voices found in this browser.</p>';
     return;
   }
 
-  voiceList.innerHTML = voices.map((v, i) => {
-    const accent = friendlyLang(v.lang);
-    const shortName = v.name.replace(/Microsoft |Google |\(Natural\)|\(Premium\)/gi, '').trim();
-    return (
-      '<button class="voice-option" data-index="' + i + '" aria-label="Select voice ' + shortName + '">' +
-        '<span class="voice-option-name">' + shortName + '</span>' +
-        '<span class="voice-option-meta">' + accent + (v.localService ? '' : ' · online') + '</span>' +
-      '</button>'
-    );
+  let globalIndex = 0;
+  voiceList.innerHTML = groups.map(({ group, voices }) => {
+    const buttons = voices.map(v => {
+      const shortName = v.name.replace(/Microsoft |Google |\(Natural\)|\(Premium\)/gi, '').trim();
+      const idx = globalIndex++;
+      return (
+        '<button class="voice-option" data-index="' + idx + '" aria-label="Select voice ' + shortName + ', ' + group + '">' +
+          '<span class="voice-option-name">' + shortName + '</span>' +
+          '<span class="voice-option-meta">' + group + (v.localService ? '' : ' · online') + '</span>' +
+        '</button>'
+      );
+    }).join('');
+    return '<p class="mode-panel-label">' + group + '</p>' + buttons;
   }).join('');
 
   voiceList.querySelectorAll('.voice-option').forEach(btn => {
@@ -389,7 +536,7 @@ function speakOutput(text) {
   window.speechSynthesis.speak(utt);
 }
 
-function doTransform() {
+async function doTransform() {
   const sentence = userInput.value.trim();
   if (!sentence) {
     userInput.style.borderBottom = '2px solid #ef4444';
@@ -403,10 +550,24 @@ function doTransform() {
     return;
   }
 
-  const output = transform(sentence, state.currentMode);
-  state.currentOutput = output;
-
+  transformBtn.disabled = true;
   statusText.classList.add('has-output');
+  statusText.textContent = 'Transforming…';
+
+  let output;
+  try {
+    output = await transform(sentence, state.currentMode);
+  } catch (err) {
+    // transform() already handles its own API/network errors internally,
+    // so reaching this catch means something truly unexpected happened.
+    // Guarantee the user still gets a result rather than a frozen button.
+    console.error('[Linguistic Simulator] Unexpected error, using local fallback:', err);
+    output = localTransform(sentence, state.currentMode);
+  } finally {
+    transformBtn.disabled = false;
+  }
+
+  state.currentOutput = output;
   statusText.textContent = output;
 
   speakOutput(output);
@@ -460,4 +621,4 @@ if ('speechSynthesis' in window) {
   setTimeout(loadVoices, 200);
 }
 
-console.log('[Linguistic Simulator] Version 3 loaded — transformation engine ready.');
+console.log('[Linguistic Simulator] Version 4 loaded — Groq-powered transformation engine ready.');
